@@ -229,5 +229,5 @@ bool ABoard::CheckGameOver()
         return true;
     }
     
-    return CurrentPieces->CheckWillCollision([](FVector OldVector){ return OldVector; });
+    return CurrentPieces->CheckWillCollide([](FVector OldVector){ return OldVector; });
 }

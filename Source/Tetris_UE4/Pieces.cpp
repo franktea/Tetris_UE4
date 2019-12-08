@@ -76,7 +76,7 @@ void APieces::TestRotate()
         return TempVector;
     };
     
-    if(!CheckWillCollision(RotateVector))
+    if(!CheckWillCollide(RotateVector))
     {
         UE_LOG(LogTemp, Warning, TEXT("now can rotate"));
         FRotator NewRotation =  this->GetActorRotation() + FRotator(0.0, 0.0, -90.0);
@@ -101,7 +101,7 @@ void APieces::MoveLeft()
         return OldVector;
     };
     
-    if(!CheckWillCollision(MoveVectorLeft))
+    if(!CheckWillCollide(MoveVectorLeft))
     {
         FVector NewLocation = GetActorLocation();
         NewLocation.Y -= 10;
@@ -116,7 +116,7 @@ void APieces::MoveRight()
         return OldVector;
     };
 
-    if(!CheckWillCollision(MoveVectorRight))
+    if(!CheckWillCollide(MoveVectorRight))
     {
         FVector NewLocation = GetActorLocation();
         NewLocation.Y += 10;
@@ -131,7 +131,7 @@ bool APieces::MoveDown()
         return OldVector;
     };
     
-    if(!CheckWillCollision(MoveVectorDown))
+    if(!CheckWillCollide(MoveVectorDown))
     {
         FVector NewLocation = GetActorLocation();
         NewLocation.Z -= 10;
