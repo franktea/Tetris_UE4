@@ -30,6 +30,9 @@ public:
     UPROPERTY()
     class USceneComponent* SceneComponent;
     
+    UPROPERTY()
+    TArray<class UMaterial*> Colors;
+    
     void DrawDebugLines();
     
     void TestRotate();
@@ -39,7 +42,7 @@ public:
     void Dismiss();
     // 检查当前的形状在某个位置时是否会与其它方块碰撞。
     // 参数ChangeBeforeCheck是一个回调函数，输入要将当前的格子移动到哪里去，向下向左向右或是旋转，用不同的回调函数即可。
-    bool CheckWillCollide(std::function<FVector(FVector OldLocation)> ChangeBeforeCheck);
+    bool CheckWillCollision(std::function<FVector(FVector OldLocation)> ChangeBeforeCheck);
 private:
     TArray<ABlock*> Blocks;
     void SpawnBlocks();

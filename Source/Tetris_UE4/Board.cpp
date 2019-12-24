@@ -172,7 +172,7 @@ void ABoard::CheckLine()
         FRotator Rotation(0.0f, 0.0f, 0.0f);
         TArray<struct FOverlapResult> OutOverlaps;
         FCollisionShape CollisionShape;
-        CollisionShape.SetBox(FVector(4.5f, 49.5f, 4.5f));
+        CollisionShape.SetBox(FVector(4.0f, 49.0f, 4.0f));
         //DrawDebugBox(GetWorld(), Location, FVector(4.5f, 49.5f, 4.5f), FColor::Purple, false, 1, 0, 1);
         FCollisionQueryParams Params;
         FCollisionResponseParams ResponseParam;
@@ -229,5 +229,5 @@ bool ABoard::CheckGameOver()
         return true;
     }
     
-    return CurrentPieces->CheckWillCollide([](FVector OldVector){ return OldVector; });
+    return CurrentPieces->CheckWillCollision([](FVector OldVector){ return OldVector; });
 }
