@@ -4,6 +4,8 @@
 #include "Pieces.h"
 #include "Components/SceneComponent.h"
 #include "DrawDebugHelpers.h"
+#include "Sound/SoundCue.h"
+#include "Kismet/GameplayStatics.h"
 #include <vector>
 
 // Sets default values
@@ -43,6 +45,18 @@ APieces::APieces()
     Colors.Add(ConstructorStatics.Color_4.Get());
     Colors.Add(ConstructorStatics.Color_5.Get());
     Colors.Add(ConstructorStatics.Color_6.Get());
+    
+    static ConstructorHelpers::FObjectFinder<USoundCue> Rotate_Sound(TEXT("SoundCue'/Game/Sounds/block-rotate_Cue.block-rotate_Cue'"));
+    if(Rotate_Sound.Succeeded())
+    {
+        RotateSoundCue = Rotate_Sound.Object;
+    }
+    
+    static ConstructorHelpers::FObjectFinder<USoundCue> MoveDown_Sound(TEXT("SoundCue'/Game/Sounds/slow-hit_Cue.slow-hit_Cue'"));
+    if(MoveDown_Sound.Succeeded())
+    {
+        MoveLeftRightSoundCue = MoveDown_Sound.Object;
+    }
 }
 
 // Called when the game starts or when spawned
@@ -111,6 +125,10 @@ void APieces::TestRotate()
         UE_LOG(LogTemp, Warning, TEXT("now can rotate"));
         FRotator NewRotation =  this->GetActorRotation() + FRotator(0.0, 0.0, -90.0);
         this->SetActorRelativeRotation(NewRotation);
+        if(RotateSoundCue)
+        {
+            UGameplayStatics::PlaySoundAtLocation(GetWorld(), RotateSoundCue, GetActorLocation(), GetActorRotation());
+        }
     }
 }
 
@@ -136,6 +154,11 @@ void APieces::MoveLeft()
         FVector NewLocation = GetActorLocation();
         NewLocation.Y -= 10;
         SetActorLocation(NewLocation);
+        
+        if(MoveLeftRightSoundCue)
+        {
+            UGameplayStatics::PlaySoundAtLocation(GetWorld(), MoveLeftRightSoundCue, GetActorLocation(), GetActorRotation());
+        }
     }
 }
 
@@ -151,10 +174,15 @@ void APieces::MoveRight()
         FVector NewLocation = GetActorLocation();
         NewLocation.Y += 10;
         SetActorLocation(NewLocation);
+        
+        if(MoveLeftRightSoundCue)
+        {
+            UGameplayStatics::PlaySoundAtLocation(GetWorld(), MoveLeftRightSoundCue, GetActorLocation(), GetActorRotation());
+        }
     }
 }
 
-bool APieces::MoveDown()
+bool APieces::MoveDown(bool PlaySound)
 {
     auto MoveVectorDown = [](FVector OldVector){
         OldVector.Z -= 10.0f;
@@ -166,6 +194,7 @@ bool APieces::MoveDown()
         FVector NewLocation = GetActorLocation();
         NewLocation.Z -= 10;
         SetActorLocation(NewLocation);
+        
         return true;
     }
     else

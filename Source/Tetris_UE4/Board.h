@@ -37,6 +37,18 @@ public:
 public:
     UPROPERTY()
     APieces* CurrentPieces;
+    
+    UPROPERTY()
+    class USoundCue* LineRemoveSoundCue;
+    
+    UPROPERTY()
+    class USoundCue* MoveToEndSoundCue;
+    
+    UPROPERTY()
+    class USoundCue* GameOverSoundCue;
+    
+    UPROPERTY()
+    class USoundCue* GameStartSoundCue;
 private:
     enum PiecesStatus { PS_NOT_INITED, PS_MOVING, PS_GOT_BOTTOM};
     PiecesStatus Status = PS_NOT_INITED;

@@ -4,6 +4,8 @@
 #include "Board.h"
 #include "EngineUtils.h"
 #include "DrawDebugHelpers.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
 
 // Sets default values
 ABoard::ABoard()
@@ -11,6 +13,29 @@ ABoard::ABoard()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+    static ConstructorHelpers::FObjectFinder<USoundCue> LineRemove_Sound(TEXT("SoundCue'/Game/Sounds/line-remove_Cue.line-remove_Cue'"));
+    if(LineRemove_Sound.Succeeded())
+    {
+        LineRemoveSoundCue = LineRemove_Sound.Object;
+    }
+    
+    static ConstructorHelpers::FObjectFinder<USoundCue> MoveToEnd_Sound(TEXT("SoundCue'/Game/Sounds/force-hit_Cue.force-hit_Cue'"));
+    if(MoveToEnd_Sound.Succeeded())
+    {
+        MoveToEndSoundCue = MoveToEnd_Sound.Object;
+    }
+    
+    static ConstructorHelpers::FObjectFinder<USoundCue> GameStart_Sound(TEXT("SoundCue'/Game/Sounds/start_Cue.start_Cue'"));
+    if(GameStart_Sound.Succeeded())
+    {
+        GameStartSoundCue = GameStart_Sound.Object;
+    }
+    
+    static ConstructorHelpers::FObjectFinder<USoundCue> GameOver_Sound(TEXT("SoundCue'/Game/Sounds/gameover_Cue.gameover_Cue'"));
+    if(GameOver_Sound.Succeeded())
+    {
+        GameOverSoundCue = GameOver_Sound.Object;
+    }
 }
 
 // Called when the game starts or when spawned
@@ -87,7 +112,7 @@ void ABoard::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void ABoard::Rotate()
 {
-    if(CurrentPieces)
+    if(CurrentPieces && Status != PS_GOT_BOTTOM)
     {
         CurrentPieces->TestRotate();
     }
@@ -98,6 +123,10 @@ void ABoard::MoveLeft()
     if(CurrentPieces)
     {
         CurrentPieces->MoveLeft();
+        if(Status == PS_GOT_BOTTOM)
+        {
+            MoveDownToEnd();
+        }
     }
 }
 
@@ -106,6 +135,10 @@ void ABoard::MoveRight()
     if(CurrentPieces)
     {
         CurrentPieces->MoveRight();
+        if(Status == PS_GOT_BOTTOM)
+        {
+            MoveDownToEnd();
+        }
     }
 }
 
@@ -137,6 +170,10 @@ void ABoard::NewPieces()
     if(bGameOver)
     {
         UE_LOG(LogTemp, Warning, TEXT("Game Over!!!!!!!!"));
+        if(GameOverSoundCue)
+        {
+            UGameplayStatics::PlaySoundAtLocation(GetWorld(), GameOverSoundCue, GetActorLocation(), GetActorRotation());
+        }
     }
 }
 
@@ -184,7 +221,7 @@ void ABoard::CheckLine()
             ++z;
             continue;
         }
-        else
+        else // this line is full, remove the line
         {
             UE_LOG(LogTemp, Warning, TEXT("Find FULL LINE at z=%d"), z);
             for(auto&& Result: OutOverlaps)
@@ -192,6 +229,11 @@ void ABoard::CheckLine()
                 Result.GetActor()->Destroy();
             }
             MoveDownFromLine(z);
+            
+            if(LineRemoveSoundCue)
+            {
+                UGameplayStatics::PlaySoundAtLocation(GetWorld(), LineRemoveSoundCue, GetActorLocation(), GetActorRotation());
+            }
         }
     }
 }
@@ -205,6 +247,11 @@ void ABoard::MoveDownToEnd()
     
     while(CurrentPieces->MoveDown())
     {
+    }
+    
+    if(MoveToEndSoundCue)
+    {
+        UGameplayStatics::PlaySoundAtLocation(GetWorld(), MoveToEndSoundCue, GetActorLocation(), GetActorRotation());
     }
     
     switch(Status)
